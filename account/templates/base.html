@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title%}{% endblock %}</title>
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+
+</head>
+<body>
+    <div id="header">
+        <span class="logo">Bookmarks</span>
+        {% if request.user.is_authenticated %}
+          <ul class="menu">
+            <li {% if section == "dashboard" %}class="selected"{% endif %}>
+              <a href="{% url "dashboard" %}">My dashboard</a>
+            </li>
+            <li {% if section == "images" %}class="selected"{% endif %}>
+              <a href="{% url 'images:list' %}">Images</a>
+            </li>
+            <!-- no need to see other users this way -->
+            <!--<li {% if section == "people" %}class="selected"{% endif %}>
+              <a href="{% url 'user_list' %}">People</a>
+            </li>-->
+              <li {% if section == "people" %}class="selected"{% endif %}>
+              <a href="{% url 'user_detail' user.username %}">Profile</a>
+            </li>
+          </ul>
+
+        <form method="GET" action="{% url 'images:list' %}" role="search" aria-label="По сайту" class="search-form">
+          <input type="text" name="search-area" placeholder="Image search by title" value="{{ search_input }}">
+          <input class="button" type="submit" value="Search">
+        </form>  
+
+        {% endif %}
+        <span class="user">
+            {% if request.user.is_authenticated %}
+                Hello {{ request.user.first_name|default:request.user.username }}
+                <a href="{% url 'logout' %}" style="text-transform:uppercase; font-weight:bold; color: black; ">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </span>
+    </div>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages%}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">x</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+  <script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+  <script>
+  const likeUrl = "{% url 'images:like' %}";
+  const csrftoken = Cookies.get('csrftoken');
+  const followUrl = '{% url "user_follow" %}';
+  </script>
+  <script src="{% static 'js/base.js' %}"></script>
+  <script src="{% static 'js/follow.js' %}"></script>
+  <script src="{% static 'js/pagination.js' %}"></script>
+  <!--<script>
+      const csrftoken = Cookies.get('csrftoken');
+      document.addEventListener('DOMContentLoaded', (event) => {
+        // DOM loaded
+        {% block domready_js %}
+      
+        {% endblock %}
+    
+  </script>-->
+</body>
+</html>

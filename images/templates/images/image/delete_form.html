@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>do you want to delete :  {{ image.title }}</p>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <input type="submit" name="confirm" class="blank-button">
+
+</form>
+{% endblock %}

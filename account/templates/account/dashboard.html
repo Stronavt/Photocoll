@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title%}Dashboard{% endblock %}
+{% load thumbnail %}
+{% block content %}
+  <h1>Dashboard</h1>
+  {% with total_images_created=request.user.images_created.count %}
+  <p>Welcome to your dashboard.
+    <!--You have bookmarked {{ total_images_created }} image{{ total_images_created|pluralize }}.--></p>
+  {% endwith %}
+
+    
+    <h2>What's happening: </h2>
+    <div id="action-list">
+    {% for action in actions %}
+
+      {% include "actions_detail.html" %}
+
+    {% endfor %}
+    </div>
+
+{% for image in images %}
+  <div class="images-dashboard">
+
+
+      {% thumbnail image.image 100x100 crop="smart" as im %}
+      <a href="{{ image.get_absolute_url }}">
+        <img src="{{ im.url }}">
+      </a>
+     
+    <div class="info">
+      <span class="date">added on {{ image.created }} </span>
+      <br/>
+      <p> {{image.title }} was added by {{ image.user}} </p>
+    </div>
+  </div>
+{% endfor %}
+
+
+
+{% endblock%}

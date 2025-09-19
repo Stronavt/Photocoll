@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Creating an album{% endblock %}
+{% block content %}
+
+<h2>Create an album</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p><input type="submit" value="Create"></p>
+</form>
+
+{% endblock %}

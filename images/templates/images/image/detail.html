@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ image.title }}{% endblock %}
+
+{% block content %}
+<div class="detail-image-container">
+  <h1>{{ image.title }}</h1>
+
+
+    <div class="image-likes">
+      <p>likes from:</p>
+      {% for user in image.users_like.all|slice:":3" %}
+        <div style="display: flex; align-items: center; font-family: 'Muli', sans-serif; margin-bottom: 8px;">
+          
+          {% if user.profile.photo %}
+          
+          
+            <img src="{{ user.profile.photo.url }}" alt="{{ user.get_full_name }}" style="width: 32px; height: 32px; border-radius: 50%;">
+          {% else %}
+           
+            <span>{{ user.get_full_name }}</span>
+          {% endif %}
+    </div>
+      {% empty %}
+        <p>Nobody likes this image yet.</p>
+      {% endfor %}
+    </div>
+
+
+
+  {% load thumbnail %}
+  {% with total_likes=image.users_like.count users_like=image.users_like.all %}
+    <div class="info-like">
+      <div>
+        <span class="count">
+        <span class="total">{{ total_likes }}</span>
+        like{{ total_likes|pluralize }}
+        </span>
+        <a href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+          {% if request.user not in users_like %}
+            Like
+          {% else %}
+            Unlike
+          {% endif %}
+        </a>
+      </div>
+
+      <a href="{% url 'images:image-delete' image.id image.slug %}" class="delete button">Delete</a>
+    </div>  
+    {% endwith %} 
+
+
+
+    <div class="image-thumbnail">
+      <a href="{{ image.image.url }}" >
+        <img src='{% thumbnail image.image 300x0 quality=100 %}' >
+      </a>
+    </div>
+
+      {% if request.user.is_authenticated %}
+      <div class="save-to-album-widget">
+          <form class="save-form" method="post" action="{% url 'images:add_image_to_album' image.id %}">
+              {% csrf_token %}
+              <select name="albums" class="album-select">
+                  <option value="">Выберите альбом</option>
+                  {% for album in request.user.albums.all %}
+                      <option value="{{ album.id }}">{{ album.title }}</option>
+                  {% endfor %}
+              </select>
+              <button type="submit">Сохранить</button>
+          </form>
+          <div class="save-message"></div>
+      </div>
+      {% endif %}
+
+
+    <div class="info-image">
+      <!--{{ image.description|linebreaks }}-->
+       <div style="display:flex; flex-direction: row; gap: 150px">
+        <a href="{{ image.user.get_absolute_url }}">
+          <img src="{{ image.user.profile.photo.url }}" class='avatar'>
+          <span" class="avatar-username">{{ image.user }}</span>
+        </a>
+
+      {% if request.user == image.user %}
+        <a href="{% url 'images:update-image-form' image.id %}" style="margin: 10px; border-radius:26px;" class=" button">Update</a>
+      {% endif %}
+        </div>
+
+      <p class="tags" style="font-family: 'Muli', sans-serif;">
+          Tag: 
+          {% for tag in image.tags.all %}
+              <a href="{% url 'images:image_list_by_tag' tag.slug %}">
+                  {{tag.name}}
+              </a>
+          {% endfor %}
+      </p>
+    </div>
+
+
+    <div class="comments-container">  
+      {% for comment in comments %}
+    <div class="comment">
+      <div class="comment-header">
+        <a href="{{ comment.user.get_absolute_url }}">
+          <img src="{{ comment.user.profile.photo.url }}" alt="{{ comment.user }}" class="avatar">
+          <span class="avatar-username">{{ comment.user }}</span>
+        </a>
+        <p class="comment-body">{{ comment.body|linebreaks }}</p>
+      </div>
+      <p class="comment-date"><i>{{ comment.created }}</i></p>
+    </div>
+  {% empty %}
+    <h2>There are no comments.</h2>
+  {% endfor %}
+
+</div>                  
+    {% include 'images/image/comment_form.html' %}
+    </div>
+{% endblock %}
+
+
+
+
+
+        <!--<p class="info">
+            Comment {{ forloop.counter }} by {{ comment.user }}
+        </br>
+            {{ comment.created }}
+        </p>-->
+

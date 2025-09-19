@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load thumbnail %}
+
+{% block title %}{{ user.get_full_name }}{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+  <h1>{{ user.get_full_name }}</h1>
+  <div class="profile-info">
+    {% if user.profile.photo %}
+      <img src="{% thumbnail user.profile.photo '180x180' %}" class="user-detail">
+    {% else %}  
+      <img src="{% thumbnail 'images/avatars/default.jpg' '180x180' %}" class="user-detail">
+    {% endif %}  
+  </div>
+
+  <div class="profile-followers">
+  {% with total_followers=user.followers.count %}
+    <span class="count">
+      <span class="total">{{ total_followers }}</span>
+      follower{{ total_followers|pluralize }}
+    </span>
+
+    
+
+    {% if request.user.is_authenticated and request.user != user %}
+      <a href="#" data-id="{{ user.id }}" style="border-radius:26px; padding:10px 20px; margin:20px 10px 0" data-action="{% if request.user in user.followers.all %}un{% endif %}follow" class="follow button">
+        {% if request.user not in user.followers.all %}
+          Follow
+        {% else %}
+          Unfollow
+        {% endif %}
+      </a>
+    {% endif %}
+  {% endwith %}
+</div>
+
+  <div class="profile-info" style="display:flex; justify-content: flex-start; flex-direction: column; gap: 20px;">
+      <a href="{% url 'edit' %}" class="detail-button button" >Edit profile</a>
+      <a href="{% url 'password_change' %}" class="detail-button button" >Change your password</a>
+      <h4 style="display:block; margin-top: 20px;">Date of birth: {{ user.profile.date_of_birth }}</h4>     
+      <h4>Email: {{ user.email }}</h4>
+  </div>
+
+
+
+    <h2>My albums: </h2>
+    <div class="album">
+    {% for album in user.albums.all %}
+      <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-images" viewBox="0 0 16 16">
+        <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+        <path fi' d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2M14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1M2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1z"/>
+      </svg>
+      <a href="{% url 'images:album_detail' album.id album.slug %}">
+            <h3>{{ album.title }}</h3>
+            <p>Изображений: {{ album.saved_items.count }}</p>
+      </a>
+
+    {% empty %}
+        <h3>У вас пока нет альбомов.</h3>
+        <a href="{% url 'images:create_album' %}" style="color:white; vertical-align:baseline;" class="detail-button button">Create an album</a>
+    {% endfor %}
+    </div>
+    
+</div> 
+
+
+
+
+      <h3 style="text-align: center; margin: 50px 0;">Saved images</h3>
+      <h2 style="text-align: left; margin: 50px 50px; color:black"><a style="color:black" href='{% url "images:create-image-form" %}'><strong>+ Create an image</strong></a></h2>
+
+    <div id="image-list" class="image-container">
+      {% include "images/image/list_images.html" with images=user.images_created.all %}
+    </div>
+
+{% endblock %}
+

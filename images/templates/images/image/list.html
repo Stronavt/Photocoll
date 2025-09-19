@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Images bookmarked{% endblock %}
+
+{% block content %}
+
+  <h1>Images bookmarked</h1>
+  <div class="image-container">
+    {% include "images/image/list_images.html" %}
+  </div>
+
+  <div class="pagination">
+    <span class="step-links">
+      {% if images.has_previous %}
+        <a href="?page={{ images.previous_page_number }}">Previous page</a>
+      {% endif %}
+      <span class="current">
+        Page {{ images.number }} of {{ images.paginator.num_pages }}
+      </span>
+        {% if images.has_next %}
+          <a href="?page={{ images.next_page_number }}"> Next page</a>
+        {% endif %}
+    </span>
+  </div>
+
+
+
+
+{% endblock %}

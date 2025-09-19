@@ -1,0 +1,10 @@
+venv
+vsc_venv
+.env
+SQlite.sqlite3
+db.sqlite3
+__pycache__
+*.pyc
+.DS_Store
+.VScode
+.idea
